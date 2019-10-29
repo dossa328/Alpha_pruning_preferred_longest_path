@@ -86,40 +86,20 @@ def get_result(_metro, in_start, in_end, in_alpha):
                     q.append(next)
         return dist[end]
 
-    # python.org origin all path
-    def find_all_paths(graph2, start, end, path=[]):
-        global count
-        path = path + [start]
+    # mine + py.origin_all_paths
+    def find_all_paths_alpha(graph2, start, end, _threshold, weight=0,  path=[[], 0]):
+        # global count
+        path[0], path[1] = path[0] + [start], path[1] + weight
         if start == end:
             # if path:
-            #     if count % 1000 == 0:
-            #         print(count, ":", len(path))
+            #     # if count % 1000 == 0:
+            #     # print(count, ":", path)
+            #     paths.append(path)
             #     count = count + 1
             return [path]
         if not start in graph2:
             return []
         paths = []
-        for node in graph2[start]:
-            if node not in path:
-                newpaths = find_all_paths(graph2, node, end, path)
-                for newpath in newpaths:
-                    paths.append(newpath)
-        return paths
-
-    # mine + py.origin_all_paths
-    def find_all_paths_alpha(graph2, start, end, _threshold, weight=0,  path=[[], 0]):
-        global count
-        path[0], path[1] = path[0] + [start], path[1] + weight
-        paths = []
-        if start == end:
-            if path:
-                # if count % 1000 == 0:
-                # print(count, ":", path)
-                paths.append(path)
-                count = count + 1
-            return [path]
-        if not start in graph2:
-            return []
         for node, w in graph2[start].items():
             if node not in path[0] and path[1] + w <= _threshold:
                 newpaths = find_all_paths_alpha(graph2, node, end, _threshold, w, c(path))
@@ -151,6 +131,7 @@ def get_result(_metro, in_start, in_end, in_alpha):
 
     # sort , 높은 점수만
     output = sorted(output, key=lambda cp: -cp[2])
+    # print(output)
     return output[0]
     # 가장 짧은 거리만
     # output = sorted(output, key=lambda cp: -cp[1])

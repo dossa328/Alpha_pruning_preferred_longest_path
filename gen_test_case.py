@@ -21,7 +21,7 @@ def rand_start_end(_data_set):
     return _start, _end
 
 
-def _gen_test(fm_trans_json, fm_line_json, fm_edges_fix_json, input_vertex):
+def _gen_test(fm_trans_json, fm_line_json, fm_edges_fix_json, input_vertex, turn_count):
 
     with open(fm_trans_json, 'r', encoding='UTF-8') as json_file:
         trans_data = json.load(json_file)
@@ -65,13 +65,14 @@ def _gen_test(fm_trans_json, fm_line_json, fm_edges_fix_json, input_vertex):
         # reresult.append(alpha_pruning2.get_result(metro, input_data[str(j)]['from'], input_data[str(j)]['to'], alpha_for_alpha_pruning)[0])
         # reresult.append(alpha_pruning2.get_result(metro, input_data[str(j)]['from'], input_data[str(j)]['to']))
         # a = a + 1
-
     sett = []
-    for i in range(5000):
+    for i in range(50000):
         ran_start, ran_end = rand_start_end(data_set)
         if not [ran_start, ran_end] in sett and not [ran_end, ran_start] in sett:
             sett.append([ran_start, ran_end])
-            print([ran_start, ran_end])
+            # print([ran_start, ran_end])
+        if len(sett) >= 5000:
+            break
 
     print(len(sett))
 
@@ -93,18 +94,28 @@ def _gen_test(fm_trans_json, fm_line_json, fm_edges_fix_json, input_vertex):
         reresult.append(cal_all_paths.get_result(metro, line_smalldata[str(i)]['from'], line_smalldata[str(i)]['to'], alpha_for_straight_forward))
         end_time = time.time()
         cal_time = cal_time + (end_time - start_time)
-        print("하는중 -> ", i)
+        # if i % 2000 == 0:
+        # print("하는중 -> ", i , len(sett))
 
     for i in range(file_len):
-        start_time = time.time()
+        start_time2 = time.time()
         reresult.append(cal_alpha_pruning.get_result(metro, line_smalldata[str(i)]['from'], line_smalldata[str(i)]['to'], alpha_for_alpha_pruning))
-        end_time = time.time()
-        cal_time2 = cal_time2 + (end_time - start_time)
-
-        print("하는중 -> ", i)
+        end_time2 = time.time()
+        cal_time2 = cal_time2 + (end_time2 - start_time2)
+        # if i % 2000 == 0:
+        # print("하는중 -> ", i , len(sett))
 
     print(cal_time / file_len)
     print(cal_time2 / file_len)
+    print(len(trans_data['trans']))
+
+    wb = openpyxl.load_workbook('smalldata_result.xlsx')
+    sheet = wb['Sheet4']
+    sheet.cell(row=turn_count, column=3, value=len(trans_data['trans']))
+    sheet.cell(row=turn_count, column=4, value=len(sett))
+    sheet.cell(row=turn_count, column=5, value=cal_time/file_len)
+    sheet.cell(row=turn_count, column=6, value=cal_time2/file_len)
+    wb.save('smalldata_result.xlsx')
 
 # for i in reresult[0]:
 #     print(i)
@@ -171,7 +182,6 @@ def _gen_test(fm_trans_json, fm_line_json, fm_edges_fix_json, input_vertex):
 # print("SF_WorkingTime: {} sec".format(end_time - start_time))
 
 
-
 # # 1.2 내 포함되는 데이터셋 만드는 코드
 # time_out = 3
 # deny = []
@@ -198,10 +208,7 @@ def _gen_test(fm_trans_json, fm_line_json, fm_edges_fix_json, input_vertex):
 #         inlist = [ran_start, ran_end]
 #         if not list in deny:
 #             deny.append([ran_start, ran_end])
-#             # sheet.cell(row=i+1, column=1, value=ran_start)
-#             # sheet.cell(row=i+1, column=2, value=ran_end)
 #             print(ran_start, ran_end)
-#             # wb.save('result2.xlsx')
 #         else:
 #             i = i - 1
 #     # pass

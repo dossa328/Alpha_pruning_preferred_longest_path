@@ -88,7 +88,7 @@ def get_result(_metro, in_start, in_end, in_alpha):
 
     # python.org origin all path
     def find_all_paths(graph2, start, end, path=[]):
-        global count
+        # global count
         path = path + [start]
         if start == end:
             # if path:
@@ -115,6 +115,9 @@ def get_result(_metro, in_start, in_end, in_alpha):
     after_pruning_all_paths_candidate_paths = []
     all_paths_candidate_paths = find_all_paths(_metro.graph.cost_matrix, in_start, in_end)
 
+    # print(all_paths_candidate_paths)
+    # print(len(all_paths_candidate_paths))
+
     for i in all_paths_candidate_paths:
         cost_buff = cal_paths_cost(_metro, i)
         if cost_buff > threshold:
@@ -134,6 +137,7 @@ def get_result(_metro, in_start, in_end, in_alpha):
 
     # sort , 높은 점수만
     output = sorted(output, key=lambda cp: -cp[2])
+    # print(output)
     return output[0]
 
     # output = sorted(output, key=lambda cp: -cp[1])
