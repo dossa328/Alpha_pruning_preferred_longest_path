@@ -1,14 +1,26 @@
-import random
 
-outputlist = []
-tlist = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-while (1):
-    out = random.sample(tlist, 3)
-    outputlist.append(out)
 
-    if len(outputlist) >= 9000000:
-        break
+# Code by Eryk Kopczyński
+import collections
 
-remove = list(set(map(tuple, outputlist)))
-print(remove)
-print(len(remove))
+
+def find_shortest_path(graph, start, end):
+    dist = {start: [start]}
+    q = collections.deque(start)
+    while len(q):
+        at = q.popleft()
+        for next in graph[at]:
+            if next not in dist:
+                dist[next] = dist[at] + [next]
+                q.append(next)
+    return dist[end]
+
+
+graph = {'A': ['B', 'C'],
+         'B': ['C', 'D'],
+         'C': ['D'],
+         'D': ['C', 'E'],
+         'E': ['F'],
+         'F': ['C']}
+
+print(find_shortest_path(graph, 'A', 'E'))

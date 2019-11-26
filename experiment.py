@@ -16,15 +16,16 @@ import openpyxl
 
 # for kk in range(4, 85):
 # 2 ~ 78
-for kk in range(2, 78):
+for kk in range(2, 3):
     # line input
-    input_vertex = input().split(',')
+    # input_vertex = input().split(',')
+    input_vertex = ['2','5','6','K','A']
 
-    wb = openpyxl.load_workbook('smalldata_result.xlsx')
-    sheet = wb['Sheet4']
-    sheet.cell(row=kk, column=1, value=kk-1)
-    sheet.cell(row=kk, column=2, value=','.join(input_vertex))
-    wb.save('smalldata_result.xlsx')
+    # wb = openpyxl.load_workbook('smalldata_result.xlsx')
+    # sheet = wb['Sheet5']
+    # sheet.cell(row=kk, column=1, value=kk-1)
+    # sheet.cell(row=kk, column=2, value=','.join(input_vertex))
+    # wb.save('smalldata_result.xlsx')
 
     fm_trans_json = 'trans_' + ','.join(input_vertex) + '.json'
     fm_line_json = 'line_' + ','.join(input_vertex) + '.json'

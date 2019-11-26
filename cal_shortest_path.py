@@ -3,11 +3,13 @@ from copy import deepcopy as c
 import numpy as np
 import collections
 import dijkstra
+import openpyxl
 count = 0
 ret_path = []
 
 
-def get_result(_metro, in_start, in_end, in_alpha):
+def get_result(_metro, in_start, in_end, trans_data, count, sheet):
+
     def cal_paths_cost(_metro, paths):
         sum = 0
         for kk in range(len(paths)-1):
@@ -85,60 +87,90 @@ def get_result(_metro, in_start, in_end, in_alpha):
                     q.append(next)
         return dist[end]
 
-    # python.org origin all path
-    def find_all_paths(graph2, start, end, path=[]):
-        # global count
-        path = path + [start]
-        if start == end:
-            # if path:
-            #     if count % 1000 == 0:
-            #         print(count, ":", path)
-            #     count = count + 1
-            return [path]
-        if not start in graph2:
-            return []
-        paths = []
-        for node in graph2[start]:
-            if node not in path:
-                newpaths = find_all_paths(graph2, node, end, path)
-                for newpath in newpaths:
-                    paths.append(newpath)
-        return paths
-
     shortest_path = find_shortest_path(_metro.graph.cost_matrix, in_start, in_end, 0)
 
     shortest_path_cost = cal_paths_cost(_metro, shortest_path)
 
-    threshold = float(shortest_path_cost) * in_alpha
+    reresult = shortest_path
 
-    after_pruning_all_paths_candidate_paths = []
-    all_paths_candidate_paths = find_all_paths(_metro.graph.cost_matrix, in_start, in_end)
+    index = 1
+    compare_paths_transdata = []
+    ways_2_transit_station = []
+    ways_3_transit_station = []
+    ways_4_transit_station = []
+    non_transdata_path = []
+    ways2 = ['서울A', '서울K', '동대문역사문화공원2', '동대문역사문화공원5', '김포공항A', '김포공항5', '까치산2', '까치산5', '효창공원앞6', '효창공원앞K', '충정로2', '충정로5', '을지로4가2', '을지로4가5', '청구5', '청구6', '신당2', '신당6', '합정2', '합정6', '영등포구청2', '영등포구청5']
+    ways3 = ['홍대입구2', '홍대입구A', '홍대입구K', '디지털미디어시티K', '디지털미디어시티A', '디지털미디어시티6', '왕십리2', '왕십리5', '왕십리K']
+    ways4 = ['공덕5', '공덕6', '공덕K', '공덕A']
+    for v in reresult:
+        chk = 0
+        for v2 in trans_data["trans"]:
+            if v == in_end:
+                pass
+            else:
+                if v2 in v:
+                    if v2 in ways2:
+                        ways_2_transit_station.append(v2)
+                    elif v2 in ways3:
+                        ways_3_transit_station.append(v2)
+                    elif v2 in ways4:
+                        ways_4_transit_station.append(v2)
+                    chk = 1
+                    compare_paths_transdata.append(v2)
+
+        if chk == 0:
+            non_transdata_path.append(v)
+        # print(compare_paths_transdata)
+        # len_compare_paths_transdata = len(compare_paths_transdata)
+
+    # wb = openpyxl.load_workbook('cls.xlsx')
+    # sheet = wb['Sheet1']
+    count = count+2
+    for_return_values = []
+    # shp pairs
+    for_return_values.append([in_start, in_end])
+    sheet.cell(row=count, column=2, value=in_start)
+    sheet.cell(row=count, column=3, value=in_end)
+    # shp 역수
+    for_return_values.append(len(shortest_path))
+    sheet.cell(row=count, column=4, value=len(shortest_path))
+    # shp 경유 역수
+    for_return_values.append(len(compare_paths_transdata))
+    sheet.cell(row=count, column=5, value=len(compare_paths_transdata))
+    # shp 경유역 리스트
+    for_return_values.append(compare_paths_transdata)
+    sheet.cell(row=count, column=6, value=str(compare_paths_transdata))
+    # shp 혼잡경유 역수
+    # shp cost
+    for_return_values.append(shortest_path_cost)
+    sheet.cell(row=count, column=7, value=int(shortest_path_cost))
+    # shp paths
+    for_return_values.append(shortest_path)
+    sheet.cell(row=count, column=8, value=str(shortest_path))
+    # wb.save('cls.xlsx')
+    sheet.cell(row=count, column=12, value=len(ways_2_transit_station))
+    sheet.cell(row=count, column=13, value=len(ways_3_transit_station))
+    sheet.cell(row=count, column=14, value=len(ways_4_transit_station))
+
+    print(for_return_values)
 
     # print(all_paths_candidate_paths)
     # print(len(all_paths_candidate_paths))
-
-    for i in all_paths_candidate_paths:
-        cost_buff = cal_paths_cost(_metro, i)
-        if cost_buff > threshold:
-            pass
-        else:
-            after_pruning_all_paths_candidate_paths.append([i, cost_buff])
-
     output = []
+    shortest_path_0 = []
     spsp = []
-    spsp.append([after_pruning_all_paths_candidate_paths, 0])
-    for p in after_pruning_all_paths_candidate_paths:
+    spsp.append([shortest_path, 0])
+    shortest_path_0.append(shortest_path)
+    for p in shortest_path_0:
         # saved.append(split(p[0]))
-        path_cost = split(p[0], _metro)
+        path_cost = split(p, _metro)
         # p.append([(pow(p[1], -1)) * path_cost])
         p.append(path_cost)
         output.append(p)
 
     # sort , 높은 점수만
-    output = sorted(output, key=lambda cp: -cp[2])
+    # output = sorted(output, key=lambda cp: -cp[2])
     # print(output)
-    return output[0]
-
-    # output = sorted(output, key=lambda cp: -cp[1])
     # return output[0]
-    # return sorted(output, key=lambda cp: -cp[2])
+
+    return for_return_values

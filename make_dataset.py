@@ -8,7 +8,7 @@ def make_data(lenofdata, dataset, input_vertex):
     # 887
     # 876
     # 기초 데이터
-    # for i in range(17958):
+    # for i in range(2636):
     #     ff_data = []
     #     input_vertex = input().split(',')
     #     # file_data[i] = {"from":input_vertex[0], "to":input_vertex[1]}
@@ -18,8 +18,7 @@ def make_data(lenofdata, dataset, input_vertex):
     #     file_data[i] = {"from": input_vertex[0], "to": input_vertex[1]}
     #     # file_data.append([input_vertex[0], input_vertex[1]])
     #
-    #
-    # with open('trans_classification_list.json', 'w', encoding="utf-8") as make_file:
+    # with open('1_2_in_trans_classification_list.json', 'w', encoding="utf-8") as make_file:
     #     json.dump(file_data, make_file, ensure_ascii=False, indent="\t")
 
     for i in range(lenofdata):
@@ -30,3 +29,7 @@ def make_data(lenofdata, dataset, input_vertex):
 
     with open(fm_line_small_json, 'w', encoding="utf-8") as make_file:
         json.dump(file_data, make_file, ensure_ascii=False, indent="\t")
+
+
+
+

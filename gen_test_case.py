@@ -3,8 +3,11 @@ import random
 import threading
 import alpha_pruning
 import cal_alpha_pruning
+import cal_paths_weights
 import cal_all_paths
+import cal_shortest_path
 import time
+import cal_scores
 import openpyxl
 from Metro import Metro
 import make_dataset
@@ -65,57 +68,140 @@ def _gen_test(fm_trans_json, fm_line_json, fm_edges_fix_json, input_vertex, turn
         # reresult.append(alpha_pruning2.get_result(metro, input_data[str(j)]['from'], input_data[str(j)]['to'], alpha_for_alpha_pruning)[0])
         # reresult.append(alpha_pruning2.get_result(metro, input_data[str(j)]['from'], input_data[str(j)]['to']))
         # a = a + 1
-    sett = []
-    for i in range(50000):
-        ran_start, ran_end = rand_start_end(data_set)
-        if not [ran_start, ran_end] in sett and not [ran_end, ran_start] in sett:
-            sett.append([ran_start, ran_end])
-            # print([ran_start, ran_end])
-        if len(sett) >= 5000:
-            break
+    # sett = []
+    # for i in range(50000):
+    #     ran_start, ran_end = rand_start_end(data_set)
+    #     if not [ran_start, ran_end] in sett and not [ran_end, ran_start] in sett:
+    #         sett.append([ran_start, ran_end])
+    #         # print([ran_start, ran_end])
+    #         print(len(sett))
+    #     if len(sett) >= 10000:
+    #         break
 
-    print(len(sett))
+    # print(sett)
+    # print(len(sett))
 
-    make_dataset.make_data(len(sett), sett, input_vertex)
+    # file_len = len(sett)
+    file_len = 1999
+
+    # make_dataset.make_data(len(sett), sett, input_vertex)
 
     metro = Metro(fm_trans_json, fm_line_json, fm_edges_fix_json)
 
-    fm_line_small_json = 'line_' + ','.join(input_vertex) + '_smalldata.json'
+    # fm_line_small_json = 'line_' + ','.join(input_vertex) + '_smalldata.json'
+    #
+    # with open(fm_line_small_json, 'r', encoding='UTF-8') as line_file:
+    #     line_smalldata = json.load(line_file)
 
-    with open(fm_line_small_json, 'r', encoding='UTF-8') as line_file:
-        line_smalldata = json.load(line_file)
-
+    ################ shortest_path구하는 곳
+    # wb = openpyxl.load_workbook('cls.xlsx')
+    # sheet = wb['Sheet1']
+    # for i in range(file_len):
+    #     # cal_shortest_path.get_result(metro, line_smalldata[str(i)]['from'], line_smalldata[str(i)]['to'], trans_data, i, sheet)
+    #     cal_shortest_path.get_result(metro, sheet.cell(i + 2, 2).value, sheet.cell(i + 2, 3).value, trans_data, i, sheet)
+    #     print(i)
+    # wb.save('cls.xlsx')
+    # /////////////////////////////////////
+    # ############### cal_scores
+    # wb = openpyxl.load_workbook('cls.xlsx')
+    # sheet = wb['Sheet1']
+    # for i in range(file_len):
+    #     cal_scores.get_result(metro, sheet.cell(i + 2, 2).value, sheet.cell(i + 2, 3).value, sheet.cell(i+2, 8).value, trans_data, i, sheet)
+    #     print(i)
+    # wb.save('cls.xlsx')
+    # /////////////////////////////////////
+    # ############### cal_weights
+    wb = openpyxl.load_workbook('cls.xlsx')
+    sheet = wb['Sheet1']
+    for i in range(file_len):
+        cal_paths_weights.get_result(metro, sheet.cell(i + 2, 2).value, sheet.cell(i + 2, 3).value, sheet.cell(i+2, 15).value, trans_data, i, sheet)
+        print(i)
+    wb.save('cls.xlsx')
+    # /////////////////////////////////////
     cal_time = 0
     cal_time2 = 0
     # 9734
-    file_len = len(sett)
-    for i in range(file_len):
-        start_time = time.time()
-        reresult.append(cal_all_paths.get_result(metro, line_smalldata[str(i)]['from'], line_smalldata[str(i)]['to'], alpha_for_straight_forward))
-        end_time = time.time()
-        cal_time = cal_time + (end_time - start_time)
-        # if i % 2000 == 0:
-        # print("하는중 -> ", i , len(sett))
 
-    for i in range(file_len):
-        start_time2 = time.time()
-        reresult.append(cal_alpha_pruning.get_result(metro, line_smalldata[str(i)]['from'], line_smalldata[str(i)]['to'], alpha_for_alpha_pruning))
-        end_time2 = time.time()
-        cal_time2 = cal_time2 + (end_time2 - start_time2)
-        # if i % 2000 == 0:
-        # print("하는중 -> ", i , len(sett))
+    # wb = openpyxl.load_workbook('cls.xlsx')
+    # sheet = wb['Sheet1']
+    #
+    # for i in range(file_len):
+    #     # reresult.append(cal_all_paths.get_result(metro, line_smalldata[str(i)]['from'], line_smalldata[str(i)]['to'], alpha_for_straight_forward))
+    #     # if sheet.cell(i+2, 5).value == 6 or sheet.cell(i+2, 5).value == 7 or sheet.cell(i+2, 5).value == 8 or sheet.cell(i+2, 5).value == 9 or sheet.cell(i+2, 5).value == 10:
+    #     #     pass
+    #     # else:
+    #     if sheet.cell(i+2, 5).value == 9:
+    #         # if sheet.cell(i+2, 9).value == 0:
+    #         start_time = time.time()
+    #         reresult.append(cal_all_paths.get_result(metro, sheet.cell(i + 2, 2).value, sheet.cell(i + 2, 3).value,
+    #                                                  alpha_for_straight_forward))
+    #         end_time = time.time()
+    #         cal_time = end_time - start_time
+    #         print(i, "th _all path finish", ":", sheet.cell(i + 2, 2).value, sheet.cell(i + 2, 3).value, "->",
+    #               cal_time)
+    #         sheet.cell(row=i + 2, column=9, value=cal_time)
+    #         wb.save('cls.xlsx')
+            # else:
+            #     start_time = time.time()
+            #     reresult.append(cal_all_paths.get_result(metro, sheet.cell(i+2, 2).value, sheet.cell(i+2, 3).value, alpha_for_straight_forward))
+            #     end_time = time.time()
+            #     cal_time = end_time - start_time
+            #     print(i, "th _all path finish", ":", sheet.cell(i+2, 2).value, sheet.cell(i+2, 3).value, "->", cal_time)
+            #     sheet.cell(row=i + 2, column=9, value=cal_time)
+            #     wb.save('cls.xlsx')
+                # if i % 2000 == 0:
+                # print("하는중 -> ", i , len(sett))
 
-    print(cal_time / file_len)
-    print(cal_time2 / file_len)
-    print(len(trans_data['trans']))
+    # ################ alpha
+    # wb = openpyxl.load_workbook('cls.xlsx')
+    # sheet = wb['Sheet1']
+    # # for kkkk in range(100):
+    # for j in range(file_len):
+    #     # if sheet.cell(j+2, 5).value == 6 or sheet.cell(j+2, 5).value == 7 or sheet.cell(j+2, 5).value == 8 or sheet.cell(j+2, 5).value == 9 or sheet.cell(j+2, 5).value == 10:
+    #     #     pass
+    #     # else:
+    #     if sheet.cell(j + 2, 5).value == 9:
+    #     # if sheet.cell(j+2, 5).value == 0 or sheet.cell(j+2, 5).value == 1 or sheet.cell(j+2, 5).value == 2 or sheet.cell(j+2, 5).value == 3 or sheet.cell(j + 2, 5).value == 4 or sheet.cell(j+2, 5).value == 5 or sheet.cell(j+2, 5).value == 6 or sheet.cell(j+2, 5).value == 7 or sheet.cell(j+2, 5).value == 8:
+    #         # if sheet.cell(j+2, 10).value == 0:
+    #         start_time2 = time.time()
+    #         reresult.append(
+    #             cal_alpha_pruning.get_result(metro, sheet.cell(j + 2, 2).value, sheet.cell(j + 2, 3).value,
+    #                                          alpha_for_alpha_pruning))
+    #         end_time2 = time.time()
+    #         cal_time2 = end_time2 - start_time2
+    #         print(j, "th _alpha path finish", ":", sheet.cell(j + 2, 2).value, sheet.cell(j + 2, 3).value, "->",
+    #               cal_time2)
+    #         sheet.cell(row=j + 2, column=10, value=cal_time2)
+    #         sheet.cell(row=j + 2, column=15, value=str(reresult[-1][0]))
+    #
+    # wb.save('cls.xlsx')
+    # print("fin")
+    # alpha /////////////////////////
+        # reresult.append(cal_alpha_pruning.get_result(metro, line_smalldata[str(j)]['from'], line_smalldata[str(j)]['to'], alpha_for_alpha_pruning))
+        #     else:
+        #         start_time2 = time.time()
+        #         reresult.append(cal_alpha_pruning.get_result(metro, sheet.cell(j + 2, 2).value, sheet.cell(j + 2, 3).value, alpha_for_alpha_pruning))
+        #         end_time2 = time.time()
+        #         cal_time2 = end_time2 - start_time2
+        #         print(j, "th _alpha path finish", ":", sheet.cell(j+2, 2).value, sheet.cell(j+2, 3).value, "->", cal_time2)
+        #         sheet.cell(row=j + 2, column=10, value=cal_time2)
+        #         wb.save('cls.xlsx')
+        #         # if i % 2000 == 0:
+        #         # print("하는중 -> ", i , len(sett))
 
-    wb = openpyxl.load_workbook('smalldata_result.xlsx')
-    sheet = wb['Sheet4']
-    sheet.cell(row=turn_count, column=3, value=len(trans_data['trans']))
-    sheet.cell(row=turn_count, column=4, value=len(sett))
-    sheet.cell(row=turn_count, column=5, value=cal_time/file_len)
-    sheet.cell(row=turn_count, column=6, value=cal_time2/file_len)
-    wb.save('smalldata_result.xlsx')
+
+    # print(cal_time / file_len)
+    # print(cal_time2 / file_len)
+    # print(len(trans_data['trans']))
+    # wb.save('cls.xlsx')
+
+    # wb = openpyxl.load_workbook('smalldata_result.xlsx')
+    # sheet = wb['Sheet4']
+    # sheet.cell(row=turn_count, column=3, value=len(trans_data['trans']))
+    # sheet.cell(row=turn_count, column=4, value=len(sett))
+    # sheet.cell(row=turn_count, column=5, value=cal_time/file_len)
+    # sheet.cell(row=turn_count, column=6, value=cal_time2/file_len)
+    # wb.save('smalldata_result.xlsx')
 
 # for i in reresult[0]:
 #     print(i)
